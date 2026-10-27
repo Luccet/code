@@ -1,6 +1,7 @@
-# The add-on's tests, against the engine's main branch: every push, every
-# pull request, and every Monday, since the engine moves on its own. The
-# same file in every add-on repository (github.com/Luccet/<name>).
+# The add-on's tests, against the engine's main branch and its latest
+# release: every push, every pull request, and every Monday, since the
+# engine moves on its own. The same file in every add-on repository
+# (github.com/Luccet/<name>).
 name: test
 
 on:
@@ -25,7 +26,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        engine: [main] # the latest engine tag joins once there is one: [main, v2.0.0]
+        engine: [main, v2.0.0] # the latest release: move it on with each engine release
     steps:
       - uses: actions/checkout@v7
       - uses: actions/checkout@v7

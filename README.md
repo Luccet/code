@@ -115,7 +115,7 @@ LUCCET_ROOT=../luccet npm test
 node test/browser.js --browsers=firefox --filter=WORDS   # some of them
 ```
 
-CI runs them on every push and every Monday, against the engine's `main`. `test/harness.js`, `tools/npm.js` and `.github/workflows/test.yml` are the same in every add-on's repository.
+CI runs them on every push and every Monday, against the engine's `main` and its latest release. `test/harness.js`, `tools/npm.js` and `.github/workflows/test.yml` are the same in every add-on's repository.
 
 ## License
 
