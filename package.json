@@ -4,6 +4,9 @@
   "description": "code.js colours the code in a Luccet note by its language, with highlight.js: keywords, strings, comments, numbers, function and type names.",
   "license": "MIT",
   "repository": "github:Luccet/code",
+  "files": [
+    "code.js"
+  ],
   "scripts": {
     "test": "node test/node.js && node test/browser.js",
     "test:node": "node test/node.js",

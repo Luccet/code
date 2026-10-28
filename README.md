@@ -7,7 +7,7 @@
 It needs Luccet 2, the [add-on API](https://luccet.dev/docs/addon-api.html) 2 (`luccet.api`). List it in `data-use` on the luccet.js tag:
 
 ````html
-<!doctype html><meta charset="utf-8"><script src="luccet.js" data-use="https://cdn.jsdelivr.net/gh/Luccet/code@1/code.js"></script>
+<!doctype html><meta charset="utf-8"><script src="luccet.js" data-use="https://cdn.luccet.dev/code/v1/code.js"></script>
 
 # Fibonacci
 
@@ -25,12 +25,12 @@ or in a `:::use` block, one entry per line, which must come first in the note (a
 <!doctype html><meta charset="utf-8"><script src="luccet.js"></script>
 
 :::use
-https://cdn.jsdelivr.net/gh/Luccet/themes@1/nord.css
-https://cdn.jsdelivr.net/gh/Luccet/code@1/code.js
+https://cdn.luccet.dev/themes/v1/nord.css
+https://cdn.luccet.dev/code/v1/code.js
 :::
 ```
 
-- **From jsDelivr,** `@1` is the newest 1.x release of this add-on.
+- **From cdn.luccet.dev,** `v1/` is the newest 1.x release of this add-on, checked for a newer one every hour; a release's own folder, such as `v1.0.0/`, never changes, and browsers keep it a year. jsDelivr serves the same tags: `https://cdn.jsdelivr.net/gh/Luccet/code@1/code.js`.
 - **A copy of your own:** put `code.js` beside your notes and list it by its path, `data-use="code.js"`.
 - **Options** go in the add-on's query string, `code.js?base=vendor/highlight`, or in `window.LUCCET = {use: {code: {…}}}` in a head script ([options](https://luccet.dev/docs/schema.html#use-options)). There is one, `base` (below).
 
@@ -75,7 +75,7 @@ The add-on maps highlight.js's classes onto ten [custom properties](https://lucc
 <!doctype html><meta charset="utf-8"><style>
 :root { --t-code-keyword: #8250df; }
 .hljs-comment { font-style: normal; }
-</style><script src="luccet.js" data-use="https://cdn.jsdelivr.net/gh/Luccet/code@1/code.js"></script>
+</style><script src="luccet.js" data-use="https://cdn.luccet.dev/code/v1/code.js"></script>
 ```
 
 The [Mermaid add-on](https://github.com/Luccet/mermaid) reads these colours too, for its diagrams' categories.
@@ -84,10 +84,10 @@ The [Mermaid add-on](https://github.com/Luccet/mermaid) reads these colours too,
 
 - **From jsDelivr.** The add-on asks for highlight.js 11.12.0 as soon as it runs, alongside the other add-ons, pinned with [SRI](https://luccet.dev/docs/publishing.html#csp) hashes. Code shows plain until it arrives, then turns coloured.
 - **A copy of your own,** for offline use or a strict policy: `?base=` names the folder of `highlight.min.js` and `languages/`, the layout of the npm package `@highlightjs/cdn-assets`, relative to the page. A copy is loaded without SRI. `tools/vendor.js` writes one (below).
-- **Content-Security-Policy.** Allow `https://cdn.jsdelivr.net` in `script-src`, or use a copy. With [`data-nonce`](https://luccet.dev/docs/publishing.html#csp), the add-on's scripts carry the nonce.
+- **Content-Security-Policy.** Allow `https://cdn.luccet.dev` (the add-on) and `https://cdn.jsdelivr.net` (highlight.js) in `script-src`, or use copies. With [`data-nonce`](https://luccet.dev/docs/publishing.html#csp), the add-on's scripts carry the nonce.
 - **A highlight.js already on the page** is used as it is, with the languages it has: the add-on loads none for it.
 - **If highlight.js does not load,** code stays plain, and the console shows a warning.
-- **Without the page.** `luccet check` and `luccet build` run the add-on (a copy of your own; one from jsDelivr is not loaded under node) and colour nothing: a built page is coloured when `luccet.js` runs on it, and without JavaScript code shows plain.
+- **Without the page.** `luccet check` and `luccet build` run the add-on (a copy of your own; one from a URL is not loaded under node) and colour nothing: a built page is coloured when `luccet.js` runs on it, and without JavaScript code shows plain.
 
 ## A local highlight.js
 
