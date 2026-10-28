@@ -30,7 +30,7 @@ https://cdn.luccet.dev/code/v1/code.js
 :::
 ```
 
-- **From cdn.luccet.dev,** `v1/` is the newest 1.x release of this add-on, checked for a newer one every hour; a release's own folder, such as `v1.0.0/`, never changes, and browsers keep it a year. jsDelivr serves the same tags: `https://cdn.jsdelivr.net/gh/Luccet/code@1/code.js`.
+- **From cdn.luccet.dev,** `v1/` is the newest 1.x release of this add-on, checked for a newer one every hour; a release's own folder, such as `v1.0.0/`, never changes, and browsers keep it a year.
 - **A copy of your own:** put `code.js` beside your notes and list it by its path, `data-use="code.js"`.
 - **Options** go in the add-on's query string, `code.js?base=vendor/highlight`, or in `window.LUCCET = {use: {code: {…}}}` in a head script ([options](https://luccet.dev/docs/schema.html#use-options)). There is one, `base` (below).
 
