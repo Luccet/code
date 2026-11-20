@@ -3,7 +3,8 @@
 // code.js under node: it runs under the command line with no diagnostic
 // and leaves colouring to the browser; its highlight.js table is well
 // formed and is the pinned version's; tools/vendor.js writes the copy ?base=
-// takes. The browser's part is test/browser.js's.
+// takes; the examples pass luccet check. The browser's part is
+// test/browser.js's.
 //
 //   LUCCET_ROOT=…/luccet node test/node.js
 'use strict';
@@ -70,5 +71,13 @@ h.test('tools/vendor.js: highlight.js in the layout ?base= takes, the files the 
     h.assert(node([path.join(h.ROOT, 'tools', 'vendor.js'), 'file.txt'], dir).code === 2, 'DIR is a file');
   }),
 );
+
+h.test('examples/: every example passes luccet check with nothing to report', () => {
+  const files = fs.readdirSync(path.join(h.ROOT, 'examples')).filter((f) => f.endsWith('.html'));
+  h.assert(files.length > 0, 'examples/ holds no note');
+  const r = h.cli(['check', 'examples'], { cwd: h.ROOT });
+  const want = `luccet check: ${files.length} note${files.length === 1 ? '' : 's'}: 0 errors, 0 warnings, 0 infos`;
+  h.assert(r.code === 0 && (r.out + r.err).trim() === want, `expected "${want}": ${r.out}${r.err}`);
+});
 
 h.runTests();
