@@ -3,8 +3,8 @@
 // code.js in Chromium and Firefox (test/harness.js): fences coloured with
 // SRI, a language loaded on first use, plain ones left; a theme's colours
 // under a strict policy with data-nonce; ?base= with a local copy; a
-// highlight.js that does not load; and a note of 300 fences coloured with
-// no long task. highlight.js comes from its local copy (tools/hljs.js), so
+// highlight.js that does not load; a note of 300 fences coloured with no
+// long task; and the examples. highlight.js comes from its local copy (tools/hljs.js), so
 // runs are the same each time and work offline after the first.
 //
 //   LUCCET_ROOT=…/luccet node test/browser.js [--browsers=…] [--filter=TEXT] [--live-cdn]
@@ -38,7 +38,48 @@ function codeNote(fences = 300) {
   return out.join('\n');
 }
 
+// The examples load the engine and a theme from cdn.luccet.dev, as a
+// reader's copy does. Here the engine is the checkout's, which the site
+// serves as /luccet.js and /luccet.css, and the theme an empty stylesheet:
+// the look is not under test. Any other request to cdn.luccet.dev fails.
+async function fromCdn(context, origin) {
+  await context.route(/^https:\/\/cdn\.luccet\.dev\//, async (route) => {
+    const url = route.request().url();
+    const engine = /^https:\/\/cdn\.luccet\.dev\/v2\/(luccet\.(?:js|css))$/.exec(url);
+    if (engine) return route.fulfill({ response: await route.fetch({ url: `${origin}/${engine[1]}` }) });
+    if (/^https:\/\/cdn\.luccet\.dev\/themes\/v1\/[\w-]+\.css$/.test(url)) return route.fulfill({ status: 200, contentType: 'text/css', body: '' });
+    return route.abort();
+  });
+}
+
 const TESTS = [
+  {
+    name: 'examples/release.html: six languages coloured, dockerfile loaded on first use; the listing keeps its lines and its highlighted line; the diff marks lines added and removed; the text fence stays plain',
+    url: '/examples/release.html',
+    setup: (context, page, ctx) => fromCdn(context, ctx.origin),
+    async check(page) {
+      await h.expect(page, () => document.querySelector('main.luccet code.language-dockerfile [class*="hljs-"]'), 'the dockerfile fence coloured', 15000);
+      const r = await page.evaluate(() => {
+        const listing = document.getElementById('lst-migration');
+        const lines = listing ? [...listing.querySelectorAll('.t-line')] : [];
+        const ref = document.querySelector('main.luccet a.t-ref[href="#lst-migration"]');
+        return {
+          coloured: ['sh', 'diff', 'sql', 'yaml', 'python', 'dockerfile'].filter((l) => document.querySelector(`main.luccet code.language-${l} [class*="hljs-"]`)),
+          diff: ['addition', 'deletion'].filter((c) => document.querySelector(`main.luccet code.language-diff .hljs-${c}`)),
+          lines: lines.length,
+          hl: lines.flatMap((l, i) => (l.classList.contains('t-hl') ? [i + 1] : [])),
+          ref: ref && ref.textContent,
+          plain: !document.querySelector('main.luccet code.language-text [class*="hljs-"]'),
+        };
+      });
+      h.assert(r.coloured.length === 6, `coloured: ${r.coloured.join(', ')}`);
+      h.assert(r.diff.length === 2, `the diff's marks: ${r.diff.join(', ')}`);
+      h.assert(r.lines === 6 && r.hl.join() === '4', `the listing: ${r.lines} lines, highlighted ${r.hl.join()}`);
+      h.assert(r.ref === 'Listing 1', `the reference reads ${r.ref}`);
+      h.assert(r.plain, 'the text fence is plain');
+    },
+  },
+
   {
     name: 'fences coloured by highlight.js with SRI, lines kept, a language loaded on first use, plain ones left',
     url: '/test/pages/code.html',

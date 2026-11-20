@@ -32,9 +32,9 @@ https://cdn.luccet.dev/code/v1/code.js
 
 - **From cdn.luccet.dev,** `v1/` is the newest 1.x release of this add-on, checked for a newer one every hour; a release's own folder, such as `v1.0.0/`, never changes, and browsers keep it a year.
 - **A copy of your own:** put `code.js` beside your notes and list it by its path, `data-use="code.js"`.
-- **Options** go in the add-on's query string, `code.js?base=vendor/highlight`, or in `window.LUCCET = {use: {code: {…}}}` in a head script ([options](https://luccet.dev/docs/schema.html#use-options)). There is one, `base` (below).
+- **Options** go in the add-on's query string, `code.js?base=vendor/highlight`, or in `window.LUCCET = {use: {code: {…}}}` in a head script ([options](https://luccet.dev/docs/addon-api.html#use-options)). There is one, `base` (below).
 
-How add-ons load, and how to write one: [Add-ons](https://luccet.dev/docs/schema.html#addons).
+How add-ons load, and how to write one: [Writing an add-on](https://luccet.dev/docs/addon-api.html#top).
 
 ## Which fences
 
@@ -78,7 +78,7 @@ The add-on maps highlight.js's classes onto ten [custom properties](https://lucc
 </style><script src="luccet.js" data-use="https://cdn.luccet.dev/code/v1/code.js"></script>
 ```
 
-The [Mermaid add-on](https://github.com/Luccet/mermaid) reads these colours too, for its diagrams' categories.
+The [Mermaid add-on](https://github.com/Luccet/diagrams#mermaid-colours) reads these colours too, for its diagrams' categories, and so does the [plots kit](https://github.com/Luccet/plots#colours), for its series.
 
 ## How it loads
 
@@ -104,6 +104,16 @@ In a clone of this repository, `node tools/vendor.js DIR` writes highlight.js, a
 The version and its hashes live in a table in `code.js`, written by `tools/hljs.js`. To move to another version, run `node tools/hljs.js VERSION`: it downloads the package from the npm registry once, checks it, and rewrites the table. `node tools/hljs.js --check` exits 1 when the table is not the pinned version's.
 
 The tools need Node 18 or later, and the network once per version.
+
+## Examples
+
+Notes that use the add-on, in [`examples/`](examples):
+
+| Example | What it shows |
+|---|---|
+| [`release.html`](examples/release.html) | fences in six languages, `dockerfile` loaded the first time a note uses it; a numbered listing with line numbers and a highlighted line; a diff; output in a plain `text` fence |
+
+They load `../code.js`, this repository's copy, so they show the add-on as it is here, and the engine and the [classic theme](https://github.com/Luccet/themes) from cdn.luccet.dev. Open one in a browser from a clone (the engine, the theme and highlight.js come over the network); `npm test` checks them.
 
 ## Tests
 

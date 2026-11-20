@@ -1,0 +1,95 @@
+<!doctype html><meta charset="utf-8">
+<script>
+  // This note's vocabulary: titled fences are numbered listings, so
+  // @lst-migration reads "Listing 1".
+  window.LUCCET = {schema: {block: {code: {counter: 'code', label: 'Listing'}}}};
+</script>
+<script src="https://cdn.luccet.dev/v2/luccet.js" data-use="../code.js https://cdn.luccet.dev/themes/v1/classic.css"></script>
+
+:::meta
+title: Releasing the tide service
+lang: en
+:::
+
+# Releasing the tide service
+
+> An example of the [code add-on](https://github.com/Luccet/code): fences in six languages
+> coloured by highlight.js, one of them (`dockerfile`) loaded the first time the note uses it;
+> a numbered listing that keeps its line numbers and its highlighted line; a diff's added and
+> removed lines; and output in a `text` fence, left plain. The colours are the
+> [classic theme's](https://github.com/Luccet/themes). The note loads `../code.js`, this
+> repository's copy.
+
+## Before tagging
+
+From a clean checkout of `main`:
+
+```sh
+git switch main && git pull --ff-only
+npm ci
+npm test && npm run build
+```
+
+## The version
+
+```diff
+ {
+   "name": "tide-service",
+-  "version": "1.4.2",
++  "version": "1.5.0",
+   "private": true,
+```
+
+## The migration
+
+1.5.0 stores each station's chart datum. @lst-migration adds the column and fills it; check
+line 4 against the station list before running it.
+
+```sql[Add each station's chart datum]{#lst-migration lines hl=4}
+ALTER TABLE stations ADD COLUMN datum_m numeric(5, 2);
+
+UPDATE stations SET datum_m = 0.00 WHERE datum_m IS NULL;
+UPDATE stations SET datum_m = -2.90 WHERE code = 'LEITH';
+
+ALTER TABLE stations ALTER COLUMN datum_m SET NOT NULL;
+```
+
+## The configuration
+
+```yaml
+stations:
+  - code: LEITH
+    name: Leith
+    datum_m: -2.90
+refresh: 15m   # how often the predictions are fetched
+```
+
+## A check after deploying
+
+```python
+import json
+import urllib.request
+
+with urllib.request.urlopen("https://tide.example/api/stations/LEITH") as r:
+    station = json.load(r)
+
+assert station["datum_m"] == -2.90, station
+print(f"{station['name']}: datum {station['datum_m']} m")
+```
+
+It prints:
+
+```text
+Leith: datum -2.9 m
+```
+
+## The container
+
+```dockerfile
+FROM node:22-slim
+WORKDIR /app
+COPY package*.json ./
+RUN npm ci --omit=dev
+COPY dist/ ./dist/
+CMD ["node", "dist/server.js"]
+```
